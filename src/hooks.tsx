@@ -31,7 +31,7 @@ export const nameToSmiles = async (name : string) => {
 }
 
 export const loadMolecule = async (smiles : string) => {
-  let molecule = await axios.get(ESMPY_API + 'api/set_molecule?smiles=' + smiles).catch((err) => {
+  let molecule = await axios.get(ESMPY_API + '/api/set_molecule?smiles=' + smiles).catch((err) => {
     window.alert('An error occured: ,' + err);
   });
 
@@ -39,7 +39,7 @@ export const loadMolecule = async (smiles : string) => {
 }
 
 export const setGeometry = async (value : number , dof : Array<number>) => {
-  let response = await axios.post(ESMPY_API + 'api/set_geometry', {
+  let response = await axios.post(ESMPY_API + '/api/set_geometry', {
     'value': value,
     'dof': dof
   }).catch((err) => {
@@ -50,7 +50,7 @@ export const setGeometry = async (value : number , dof : Array<number>) => {
 }
 
 export const runJob = async (axis: Array<axis>, method : string, basis : string) => {
-  let response = await axios.post(ESMPY_API + 'api/run_job', {
+  let response = await axios.post(ESMPY_API + '/api/run_job', {
     'axis': axis,
     'method': method,
     'basis': basis,
@@ -62,7 +62,7 @@ export const runJob = async (axis: Array<axis>, method : string, basis : string)
 }
 
 export const getSlice = async (values : Array<number>, indices : Array<number>) => {
-  let response = await axios.get(ESMPY_API + `api/get_slice?indices=${indices}&values=${values}`).catch((err) => {
+  let response = await axios.get(ESMPY_API + `/api/get_slice?indices=${indices}&values=${values}`).catch((err) => {
     window.alert('An error occured: ,' + err);
   });
 
@@ -70,7 +70,7 @@ export const getSlice = async (values : Array<number>, indices : Array<number>) 
 }
 
 export const viewOrbitals = async (basis : string) => {
-  let response = await axios.get(ESMPY_API + `api/view_orbitals?basis=${basis}`).catch((err) => {
+  let response = await axios.get(ESMPY_API + `/api/view_orbitals?basis=${basis}`).catch((err) => {
     window.alert('An error occured: ,' + err);
   });
 
