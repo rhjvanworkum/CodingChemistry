@@ -1,15 +1,14 @@
-import { Grid, TextField, Dialog, DialogTitle, makeStyles } from '@material-ui/core';
+import { Grid, TextField, Dialog, DialogTitle, makeStyles, Typography } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 import {ControlSelectComponent} from '../components/Select';
 import BlueButton from '../components/Button';
 import React, {useState, Dispatch, useEffect} from 'react';
 import {useDispatch} from 'react-redux';
-import { moleculeReducer, setLoading, setMolecule } from '../store/reducers';
+import { setLoading } from '../store/reducers';
 import { hemiLight, loadMolecule, nameToSmiles, perspectiveCamera, viewOrbitals } from '../hooks';
 import ThreeScene from '../components/ThreeScene';
 
 import * as THREE from 'three';
-import { AirlineSeatLegroomExtraRounded } from '@material-ui/icons';
 import * as math from 'mathjs';
 import { NumberInput } from '../components/Input';
 
@@ -25,106 +24,6 @@ const basisSets = [
   'aug-cc-pvqz',
   'aug-cc-pvtz',
 ];
-
-const useStyles = makeStyles({
-  Input: {
-    height: '43px',
-    width: '150px',
-    borderRadius: '5px',
-    BackgroundColor: '#1D7DFF',
-  }
-});
-
-const MoViewer : React.FC = () => {
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState('name');
-  const [basisSet, setBasisSet] = useState(basisSets[0]);
-  const [box, setBox] = useState([]);
-
-  const [loaded, setLoaded] = useState(false);
-
-  const [E, setE] = useState([]);
-  const [C, setC] = useState([]);
-  const [basisfunctions, setBasisfunctions] = useState<Array<basisFunction>>([]);
-
-  const [index, setIndex] = useState(0);
-  const [moIndex, setMoIndex] = useState(0);
-
-  const dispatch : Dispatch<any> = useDispatch();
-
-  const classes = useStyles();
-
-
-  const handleChange = (event : any) => {
-    setName((event.target as HTMLFormElement).value);
-  }
-
-  const submitName = async (event : any) => {
-    dispatch(setLoading(true));
-    let smiles = await nameToSmiles(name);
-    let object = await loadMolecule(smiles);
-    let data = await viewOrbitals(basisSet);
-    setE(data.E)
-    setC(data.C)
-    setBasisfunctions(data.basis_functions.map((bf : Array<any>) : basisFunction => {
-      return {coeffiecents: bf[2], ang_mom: bf[1], exponents: bf[3], origin: bf[0]}
-    }));
-    setBox(data.box)
-    setLoaded(true);
-    dispatch(setLoading(false));
-  }
-
-  return (
-    <div>
-      <h2>MO Viewer</h2>
-      <p>A tool to look at how Molecular Orbitals arise in the Self-consisten field algorithm using HF. 
-        The code for the backend can be found at: www.github.com/rhjvanworkum/pyEsm. 
-      </p>
-
-      <Grid container justify="center" style={{marginTop: "5%"}}>
-        <BlueButton label="Start" clickHandler={() => {setOpen(true)}} />
-      </Grid>
-
-      <Dialog open={open} maxWidth="md">
-        <DialogTitle>Set Settings</DialogTitle>
-        <div style={{marginLeft: '94%', marginTop: '-5%'}}>
-          <ClearIcon onClick={() => {setOpen(false)}}/>
-        </div>
-
-        <Grid container justify="flex-start" spacing={2} style={{marginLeft: '4%'}}> 
-          <Grid item>
-            <TextField className={classes.Input} InputProps={{disableUnderline: true}} label="molecule" onChange={handleChange} />
-          </Grid>
-          <Grid item>
-            <BlueButton label="Insert" clickHandler={submitName} /> 
-          </Grid>
-          <Grid item>
-            <ControlSelectComponent value={basisSet} setValue={(value) => {
-              setBasisSet(value);
-            }} items={basisSets} values={basisSets} />
-          </Grid>
-        </Grid>
-      </Dialog>
-
-      {loaded && 
-        <>
-          <Grid container justify="center" style={{marginTop: "5%"}}>
-            <BlueButton label="Previous" clickHandler={() => {index === 0 ? setIndex(E.length - 1) : setIndex(index - 1)}} />
-            <BlueButton label="Next" clickHandler={() => {index === (E.length - 1) ? setIndex(0) : setIndex(index + 1)}} />
-            <ControlSelectComponent value={moIndex} setValue={(value) => {
-                  setMoIndex(value);
-                }} items={E} values={E.map((item : any, index : number) => index)} />
-          </Grid>
-
-          <OrbitalViewer moCoeffiecents={C[index][0]} basisFunctions={basisfunctions} box={box}/> 
-        </>
-      }
-    
-    </div>
-  );
-};
-
-export default MoViewer;
 
 interface basisFunction {
   coeffiecents: Array<number>;
@@ -163,40 +62,199 @@ const getColor = (x : number, y : number, z : number, mo : Array<number>, bfs : 
   return result;
 }
 
-
-const OrbitalViewer: React.FC<orbital> = (props : orbital) => {
-
-  const box = props.box;
-
-  const resolution = 0.5;
-  const reach = 2;
-
-  const vertices = [];
-  const colors = [];
-
-  console.log(props.basisFunctions);
-  console.log(box);
-  console.log(props.moCoeffiecents);
-
-  for (let x = box[0][0] - reach; x < box[1][0] + reach; x += resolution) {
-    for (let y = box[0][1] - reach; y < box[1][1] + reach; y += resolution) {
-      for (let z = box[0][2] - reach; z < box[1][2] + reach; z += resolution) {
-          vertices.push(x,y,z);
-          let c1 = Math.abs(getColor(x, y, z, props.moCoeffiecents, props.basisFunctions));
-          colors.push(255, 255 - c1 * 255, 255 - c1 * 255);
-      }
-    }
+const useStyles = makeStyles({
+  Input: {
+    height: '43px',
+    width: '150px',
+    borderRadius: '5px',
+    BackgroundColor: '#1D7DFF',
   }
+});
+
+const MoViewer : React.FC = () => {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState('name');
+  const [basisSet, setBasisSet] = useState(basisSets[0]);
+  const [box, setBox] = useState([]);
+
+  const [E, setE] = useState<Array<Array<number>>>([]);
+  const [C, setC] = useState([]);
+  const [basisfunctions, setBasisfunctions] = useState<Array<basisFunction>>([]);
+
+  const [index, setIndex] = useState(0);
+  const [moIndex, setMoIndex] = useState(0);
+  const [resolution, setResolution] = useState(0.5);
+  const [reach, setReach] = useState(2);
+
+  const [points, setPoints] = useState<THREE.Points | null>(null);
+
+  const dispatch : Dispatch<any> = useDispatch();
+  const classes = useStyles();
 
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-  const material = new THREE.PointsMaterial( { vertexColors: true, size: 0.1 } );
-  const points = new THREE.Points(geometry, material);
+  const material = new THREE.PointsMaterial( { vertexColors: true, size: 0.05 } );
+
+  const handleChange = (event : any) => {
+    setName((event.target as HTMLFormElement).value);
+  }
+
+  const submitName = async () => {
+    dispatch(setLoading(true));
+    let smiles = await nameToSmiles(name);
+    let object = await loadMolecule(smiles);
+    let data = await viewOrbitals(basisSet);
+    setE(data.E)
+    setC(data.C)
+    setBasisfunctions(data.basis_functions.map((bf : Array<any>) : basisFunction => {
+      return {coeffiecents: bf[2], ang_mom: bf[1], exponents: bf[3], origin: bf[0]}
+    }));
+    setBox(data.box)
+    dispatch(setLoading(false));
+  }
+
+  useEffect(() => {
+    if (box.length > 0) {
+      const vertices = [];
+      const colors = [];
+  
+      for (let x = box[0][0] - reach; x < box[1][0] + reach; x += resolution) {
+        for (let y = box[0][1] - reach; y < box[1][1] + reach; y += resolution) {
+          for (let z = box[0][2] - reach; z < box[1][2] + reach; z += resolution) {
+              let c = getColor(x, y, z, C[index][moIndex], basisfunctions);
+              if (Math.abs(c) > 0.05) {
+                vertices.push(x,y,z);
+    
+                if (c >= 0) {
+                  colors.push(c * 255, 0, 0);
+                } else {
+                  colors.push(0, 0, -1 * c * 255);
+                }
+              }
+          }
+        }
+      }
+    
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      setPoints(new THREE.Points(geometry, material));
+    }
+  }, [index, moIndex, resolution, reach, box])
 
   return (
-    <>
-      <ThreeScene width={800} height={800} camera={perspectiveCamera(800, 800)} lights={hemiLight()} meshes={[points]} />
-    </>
-  )
-}
+    <div>
+      <h2>MO Viewer</h2>
+      <p>A tool to look at how Molecular Orbitals arise in the Self-consisten field algorithm using HF. 
+        The code for the backend can be found at: <a href="https://github.com/rhjvanworkum/pyEsm">https://github.com/rhjvanworkum/pyEsm</a>.  
+      </p>
+
+      <Grid container justify="center" style={{marginTop: "5%"}}>
+        <BlueButton label="Start" clickHandler={() => {setOpen(true)}} />
+      </Grid>
+
+      <Dialog open={open} maxWidth="md">
+        <DialogTitle>Set Settings</DialogTitle>
+        <div style={{marginLeft: '94%', marginTop: '-5%'}}>
+          <ClearIcon onClick={() => {setOpen(false)}}/>
+        </div>
+
+        <Grid container justify="flex-start" spacing={2} style={{marginLeft: '4%'}}> 
+          <Grid item>
+            <TextField className={classes.Input} InputProps={{disableUnderline: true}} label="molecule" onChange={handleChange} />
+          </Grid>
+          <Grid item>
+            <BlueButton label="Insert" clickHandler={() => { setOpen(false); submitName(); }} /> 
+          </Grid>
+          <Grid item>
+            <ControlSelectComponent value={basisSet} setValue={(value) => {
+              setBasisSet(value);
+            }} items={basisSets} values={basisSets} />
+          </Grid>
+        </Grid>
+      </Dialog>
+
+      {box.length > 0 && 
+        <>
+          <Grid container justify="flex-start" style={{marginTop: "5%"}}>
+
+              <Grid container justify="center" style={{marginTop: "2%"}}>
+                <Grid item xs={1}>
+                  <ControlSelectComponent value={moIndex} setValue={(value) => {
+                    setMoIndex(value);
+                  }} items={E[index].map((item : any, index : number) => `MO ${index}`)} values={E[index].map((item : any, index : number) => index)} />
+                </Grid>
+                <Grid item xs={3}>
+                  <b>MO Energy: {E[index][moIndex]}</b>
+                </Grid>
+              </Grid>
+
+              <Grid container justify="center" style={{marginTop: "2%"}}>
+                <Grid item xs={2}>
+                    <BlueButton label="Previous" clickHandler={() => {index === 0 ? setIndex(E.length - 1) : setIndex(index - 1)}} />
+                </Grid>
+                <Grid item xs={1}>
+                  <Typography>Iteration: {index}</Typography>
+                </Grid>
+                <Grid item xs={1}>
+                  <BlueButton label="Next" clickHandler={() => {index === (E.length - 1) ? setIndex(0) : setIndex(index + 1)}} />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid container justify="center" style={{marginTop: "2%"}}>
+              <Grid item xs={2}>
+                <NumberInput value={resolution} label="Resolution" setValue={(value) => { if (value !== 0) setResolution(value)}} />
+              </Grid>
+              <Grid item xs={2}>
+                <NumberInput value={reach} label="Reach" setValue={(value) => { if (value < 5) setReach(value)}} />
+              </Grid>
+            </Grid>
+
+            {points !== null && <Grid container justify="center" style={{marginTop: "3%"}}>
+              <ThreeScene width={window.innerWidth * 0.5} height={window.innerHeight * 0.7} camera={perspectiveCamera(window.innerWidth * 0.5, window.innerHeight * 0.7)} lights={hemiLight()} meshes={[points]} color={'#000000'}/>
+            </Grid>}
+        </>
+      }
+    
+    </div>
+  );
+};
+
+export default MoViewer;
+
+
+// const OrbitalViewer: React.FC<orbital> = (props : orbital) => {
+
+//   const box = props.box;
+
+//   const vertices = [];
+//   const colors = [];
+
+//   for (let x = box[0][0] - reach; x < box[1][0] + reach; x += resolution) {
+//     for (let y = box[0][1] - reach; y < box[1][1] + reach; y += resolution) {
+//       for (let z = box[0][2] - reach; z < box[1][2] + reach; z += resolution) {
+//           let c = getColor(x, y, z, props.moCoeffiecents, props.basisFunctions);
+//           if (Math.abs(c) > 0.05) {
+//             vertices.push(x,y,z);
+
+//             if (c >= 0) {
+//               colors.push(c * 255, 0, 0);
+//             } else {
+//               colors.push(0, 0, -1 * c * 255);
+//             }
+//           }
+//       }
+//     }
+//   }
+
+//   const geometry = new THREE.BufferGeometry();
+//   geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+//   geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+//   const material = new THREE.PointsMaterial( { vertexColors: true, size: 0.05 } );
+//   const points = new THREE.Points(geometry, material);
+
+//   return (
+//     <>
+      
+//     </>
+//   )
+// }

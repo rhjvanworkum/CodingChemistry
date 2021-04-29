@@ -8,13 +8,13 @@ interface scenePropsType {
   camera: THREE.Camera,
   lights: Array<THREE.Light>,
   meshes: Array<THREE.Mesh | THREE.Points>,
-  renderLoop?: any,
+  color?: string
 }
 
 const ThreeScene : React.FC<scenePropsType> = (props : scenePropsType) => {
   const canvas = useRef<HTMLDivElement>(null);
 
-  const {width, height, camera, lights, meshes} = props;
+  const {width, height, camera, lights, meshes, color} = props;
 
   const scene = new THREE.Scene();
   const renderer = new THREE.WebGLRenderer({antialias: true});
@@ -36,7 +36,7 @@ const ThreeScene : React.FC<scenePropsType> = (props : scenePropsType) => {
         scene.remove(scene.children[scene.children.length - 1]);
       }
       // Add Renderer
-      renderer.setClearColor('#ffffff');
+      renderer.setClearColor(color === undefined ? '#ffffff' : color);
       renderer.setPixelRatio( window.devicePixelRatio );
       renderer.setSize(width, height);
       renderer.shadowMap.enabled = true;

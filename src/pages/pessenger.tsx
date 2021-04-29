@@ -1,4 +1,4 @@
-import { Button, FormControl, Grid, Slider, Typography, makeStyles, Dialog, DialogTitle, Select, FormControlLabel, Checkbox } from '@material-ui/core';
+import { FormControl, Grid, Slider, Typography, Dialog, DialogTitle } from '@material-ui/core';
 import React, { useState, Dispatch } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import {axis, setAtomPositions, setCurrAxisValue, finishJob} from '../store/reducers';
@@ -10,8 +10,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 import BlueButton from '../components/Button';
 import PES from '../components/PES';
 import { useEffect } from 'react';
-import {axisToArray, convertDof, setGeometry, runJob, getSlice} from '../hooks';
-import { getSyntheticLeadingComments } from 'typescript';
+import {axisToArray, convertDof, setGeometry, runJob } from '../hooks';
 
 const views = [
   "side-by-side",
@@ -59,7 +58,7 @@ const Pessenger : React.FC = (props) => {
       <p>A tool to generate Potential Energy surfaces over molecular bond lengths and angle, using ab-initio electronic structure methods. One can search for molecules 
         by it's chemical name. The available Degrees of Freedom will be listed and the user can specify certain axis corresponding to a degree of freedom, along which
         the energy of the molecule will be sampled. The user can than control the different DOF's and see the result simultaneously in the 3D viewer as in the Potential 
-        Energy Surface itself. The code for the backend can be found at: www.github.com/rhjvanworkum/pyEsm. 
+        Energy Surface itself. The code for the backend can be found at: <a href="https://github.com/rhjvanworkum/pyEsm">https://github.com/rhjvanworkum/pyEsm</a>. 
       </p>
 
       <b style={{marginRight: '2%'}}>Set View:</b>

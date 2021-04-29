@@ -1,17 +1,15 @@
 import React, {useEffect, useState, Dispatch} from 'react';
-import {Grid, TextField, Paper, Table, TableHead, TableBody, TableContainer, TableCell, TableRow, Dialog, DialogTitle} from '@material-ui/core';
+import {Grid, Paper, Table, TableHead, TableBody, TableContainer, TableCell, TableRow, Dialog, DialogTitle} from '@material-ui/core';
 import * as THREE from 'three';
 import axios from 'axios';
-import {hemiLight, perspectiveCamera} from '../hooks';
+import {hemiLight, perspectiveCamera, runJobMd} from '../hooks';
 import ThreeAnimationScene from '../components/ThreeAnimationScene';
 import BlueButton from '../components/Button';
 import ControlSelectComponent from '../components/Select';
 import ClearIcon from '@material-ui/icons/Clear';
 import { useDispatch } from 'react-redux';
 import {setLoading} from "../store/reducers";
-
-const SIMPLE_MD_API = "https://whispering-castle-92590.herokuapp.com";
-
+import { NumberInput } from '../components/Input';
 
 interface option {
   name: string;
@@ -49,6 +47,9 @@ const examples : Array<example> = [
   {model: "TIP4P", integrator: "Pred-Corr", forces: "PBP", density: "1", temperature: "1", timestep: "0.005"},
 ];
 
+const geom = new THREE.SphereBufferGeometry(0.1, 32, 32);
+const materials = [new THREE.MeshPhongMaterial( {color: "#cc0000"} ), new THREE.MeshPhongMaterial( {color: "#FFFFFF" } )]
+
 const SimpleMDSimulator : React.FC = () => {
   // system settings
   const [system, setSystem] = useState('');
@@ -77,75 +78,32 @@ const SimpleMDSimulator : React.FC = () => {
     {name: "steps", min: 1000, max: 50000, state: steps, setState: setSteps, type: 'int'}
   ];
 
-  const handleChange = (event : any, setting : setting) => {
-    let value = setting.type === 'int' ? parseInt((event.target as HTMLFormElement).value) : parseFloat((event.target as HTMLFormElement).value);
-    if (value >= setting.min && value <= setting.max) {
-      setting.setState(value);
-    }
-  }
-
   const runJob = async () => {
     dispatch(setLoading(true));
-    const data = await axios.post(`/api/run_job`, {
-      'N': cellSize,
-      'density': density,
-      'temperature': temp,
-      'delta_t': timeStep,
-      'steps': steps,
-      'system': system,
-      'integrator': integrator,
-      'forces': forces
-    }).then((resp) => {
-      if (typeof(resp.data) !== 'string') {
-        setTrajData(resp.data.output);
-      }
-    }).catch((err) => window.alert('Sorry, your requested calculation did not suceed. Please try a different setting'));
-    // const data = await axios({
-    //   method: 'post',
-    //   url: SIMPLE_MD_API + '/api/run_job', 
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   data: {
-    //   'N': cellSize,
-    //   'density': density,
-    //   'temperature': temp,
-    //   'delta_t': timeStep,
-    //   'steps': steps,
-    //   'system': system,
-    //   'integrator': integrator,
-    //   'forces': forces
-    // }}).then((resp) => {
-    //   if (typeof(resp.data) !== 'string') {
-    //     setTrajData(resp.data.output);
-    //   }
-    // }).catch((err) => window.alert('Sorry, your requested calculation did not suceed. Please try a different setting'));
+    let data = await runJobMd(cellSize, density, temp, timeStep, steps, system, integrator, forces);
+    setTrajData(data);
     dispatch(setLoading(false));
   }
 
   useEffect(() => {
     if (trajData.length > 0) {
-      const geom = new THREE.SphereBufferGeometry(0.1, 32, 32);
-      const mesh = [];
-      const mat = [];
+      const meshes = [];
       if (system === "LJ") {
-        mat.push(new THREE.MeshPhongMaterial( {color: "#cc0000"} ));
-        mesh.push(new THREE.Mesh(geom, mat[0]));
+        meshes.push(new THREE.Mesh(geom, materials[0]));
       } else if (system === "TIP4P") {
-        mat.push(new THREE.MeshPhongMaterial( {color: "#FFFFFF" } ), new THREE.MeshPhongMaterial( {color: "#cc0000"} ));
-        mesh.push(new THREE.Mesh(geom, mat[0]), new THREE.Mesh(geom, mat[1]));
+        meshes.push(new THREE.Mesh(geom, materials[1]), new THREE.Mesh(geom, materials[0]));
       }
 
       let molecules : Array<any> = [];
       for (let i = 0; i < trajData[0].length; i++) {
         let mol : any;
         if (system === "LJ") {
-            mol = mesh[0].clone();
+            mol = meshes[0].clone();
         } else if (system === "TIP4P") {
             if (i % 3 === 0) {
-                mol = mesh[0].clone();
+                mol = meshes[0].clone();
             } else {
-                mol = mesh[1].clone();
+                mol = meshes[1].clone();
             }
         }
         molecules.push(mol);
@@ -161,7 +119,7 @@ const SimpleMDSimulator : React.FC = () => {
       <h2>Simple MD simulator</h2>
       <p>A simple MD simulator with a Lennard-Jones model of gas particles and a TIP-4P model of water(H2O). The available integrators are
         written using the Leapfrog, Verlet-Velocity and Predictor-Corrector method and the forces between the particles can be evaluated using
-        a simple pair-by-pair evaluation(PBP) or a cell-devisioned(CD) evaluation. The code for the backend can be found at: www.github.com/rhjvanworkum/simple-md-simulator. 
+        a simple pair-by-pair evaluation(PBP) or a cell-devisioned(CD) evaluation. The code for the backend can be found at: <a href="https://github.com/rhjvanworkum/simpleMd">https://github.com/rhjvanworkum/simpleMD</a>. 
       </p>
 
       <p>A few examples of settings that work:</p>
@@ -228,7 +186,7 @@ const SimpleMDSimulator : React.FC = () => {
               {settings.map((setting: setting) => {
                 return (
                   <Grid item xs={2}>
-                    <TextField InputProps={{disableUnderline: true}}value={setting.state} type="number" label={setting.name} onChange={(e) => {handleChange(e, setting)}}/>
+                    <NumberInput value={setting.state} label={setting.name} setValue={(value) => { if (value >= setting.min && value <= setting.max) setting.setState(value); }} />
                   </Grid>
                 );
               })}

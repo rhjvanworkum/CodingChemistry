@@ -22,9 +22,10 @@ const Layout : React.FC = ({ children }) => {
       </header>
       {children}
       <footer className="site-footer">
-        <p>&copy; {new Date().getFullYear()} A website by Ruard van Workum</p>
-        <GitHubIcon></GitHubIcon>
-        <LinkedInIcon></LinkedInIcon>
+        <a href="https://github.com/rhjvanworkum/CodingChemistry">Find the code for this website here</a>
+        <p style={{marginTop: '1%'}}>&copy; {new Date().getFullYear()} A website by Ruard van Workum</p>
+        <a href="https://github.com/rhjvanworkum"><GitHubIcon></GitHubIcon></a>
+        <a href="https://www.linkedin.com/in/ruard-van-workum-6a9889174/"><LinkedInIcon></LinkedInIcon></a>
       </footer>
     </div>
   )

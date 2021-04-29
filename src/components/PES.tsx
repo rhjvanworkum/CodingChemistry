@@ -1,6 +1,6 @@
-import {Checkbox, FormControlLabel, FormHelperText, MenuItem, Select} from '@material-ui/core';
-import React, {Dispatch, useState, useEffect} from 'react';
-import {shallowEqual, useDispatch, useSelector} from 'react-redux';
+import {Checkbox, FormControlLabel, FormHelperText, Select} from '@material-ui/core';
+import React, {useState, useEffect} from 'react';
+import {shallowEqual, useSelector} from 'react-redux';
 import PlotlyPlot from './PlotlyPlot';
 import {axis} from '../store/reducers';
 import {axisToArray, convertDof, getSlice} from '../hooks';

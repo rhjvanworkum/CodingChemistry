@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {shallowEqual, useSelector} from 'react-redux';
 import createPlotlyComponent from 'react-plotly.js/factory';
 
@@ -55,8 +55,6 @@ const PlotlyPlot : React.FC<plotProps> = (props : plotProps) => {
       const ax2 = axis[index2];
       const colors = Array(props.data.x.length).fill('rgba(255, 255, 255, 0)');
       colors[currAxisValues[index1]] = 'rgb(255, 0, 0)';
-
-      console.log(props.data.z);
 
       return (
         <Plot
