@@ -6,10 +6,10 @@ import BlueButton from '../components/Button';
 const MolecularArt : React.FC = (props) => {
 
   const string = `
-  <script src="https://shrouded-bastion-69549.herokuapp.com/three.min.js"></script>
-  <script src="https://shrouded-bastion-69549.herokuapp.com/THREE.MeshLine.js"></script>
-  <script src="https://shrouded-bastion-69549.herokuapp.com/utils.js"></script>
-  <script src="https://shrouded-bastion-69549.herokuapp.com/art.js"></script>
+  <script src="https://shrouded-bastion-69549.herokuapp.com/molecular-art/three.min.js"></script>
+  <script src="https://shrouded-bastion-69549.herokuapp.com/molecular-art/THREE.MeshLine.js"></script>
+  <script src="https://shrouded-bastion-69549.herokuapp.com/molecular-art/utils.js"></script>
+  <script src="https://shrouded-bastion-69549.herokuapp.com/molecular-art/art.js"></script>
   `;
 
   return (

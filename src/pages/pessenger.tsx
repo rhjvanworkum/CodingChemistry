@@ -5,6 +5,7 @@ import {axis, setAtomPositions, setCurrAxisValue, finishJob} from '../store/redu
 import Modal from '../components/Modal';
 import MolViewer from '../components/MolViewer';
 import { ControlSelectComponent } from '../components/Select';
+import MuiAlert from '@material-ui/lab/Alert';
 import { resizeWindow, setLoading } from '../store/reducers';
 import ClearIcon from '@material-ui/icons/Clear';
 import BlueButton from '../components/Button';
@@ -60,6 +61,8 @@ const Pessenger : React.FC = (props) => {
         the energy of the molecule will be sampled. The user can than control the different DOF's and see the result simultaneously in the 3D viewer as in the Potential 
         Energy Surface itself. The code for the backend can be found at: <a href="https://github.com/rhjvanworkum/pyEsm">https://github.com/rhjvanworkum/pyEsm</a>. 
       </p>
+
+      <MuiAlert style={{marginBottom: '5%'}} elevation={6} variant="filled" severity="warning">Calculating a PES can take a lot of time. It is highly advices to only consider small molecules with minimal basis set's and few sample points unless you keep the browser open for a long time</MuiAlert>
 
       <b style={{marginRight: '2%'}}>Set View:</b>
       <ControlSelectComponent value={view} setValue={(value) => {
