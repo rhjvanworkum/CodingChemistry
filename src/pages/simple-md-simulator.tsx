@@ -81,7 +81,7 @@ const SimpleMDSimulator : React.FC = () => {
   const runJob = async () => {
     dispatch(setLoading(true));
     let data = await runJobMd(cellSize, density, temp, timeStep, steps, system, integrator, forces);
-    setTrajData(data);
+    setTrajData(data.output);
     dispatch(setLoading(false));
   }
 

@@ -62,9 +62,12 @@ const Pessenger : React.FC = (props) => {
         Energy Surface itself. The code for the backend can be found at: <a href="https://github.com/rhjvanworkum/pyEsm">https://github.com/rhjvanworkum/pyEsm</a>. 
       </p>
 
-      <MuiAlert style={{marginBottom: '5%'}} elevation={6} variant="filled" severity="warning">Calculating a PES can take a lot of time. It is highly advices to only consider small molecules with minimal basis set's and few sample points unless you keep the browser open for a long time</MuiAlert>
+      <b>You can click on the 3D scene and use your mouse to move around and scroll in on the scene</b>
 
-      <b style={{marginRight: '2%'}}>Set View:</b>
+      <MuiAlert style={{marginBottom: '5%'}} elevation={6} variant="filled" severity="warning">Calculating a PES can take a lot of time. It is highly advices to only consider small molecules with minimal basis set's and few sample points otherwise a fetch error might occur.
+      Try water using HF/sto-3g with about 8 points first</MuiAlert>
+
+      <b style={{marginRight: '2%', marginTop: '2%'}}>Set View:</b>
       <ControlSelectComponent value={view} setValue={(value) => {
         dispatch(resizeWindow(value));
         setView(value);

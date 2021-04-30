@@ -83,7 +83,7 @@ const MoViewer : React.FC = () => {
 
   const [index, setIndex] = useState(0);
   const [moIndex, setMoIndex] = useState(0);
-  const [resolution, setResolution] = useState(0.5);
+  const [resolution, setResolution] = useState(0.1);
   const [reach, setReach] = useState(2);
 
   const [points, setPoints] = useState<THREE.Points | null>(null);

@@ -55,7 +55,7 @@ const PlotlyPlot : React.FC<plotProps> = (props : plotProps) => {
       const ax2 = axis[index2];
       const colors = Array(props.data.x.length).fill('rgba(255, 255, 255, 0)');
       colors[currAxisValues[index1]] = 'rgb(255, 0, 0)';
-
+      
       return (
         <Plot
           data={[

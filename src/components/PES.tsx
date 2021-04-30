@@ -7,29 +7,36 @@ import {axisToArray, convertDof, getSlice} from '../hooks';
 
 const PES : React.FC<any> = (props : any) => {
   const {currAxisValues, axis} = useSelector((state : any) => state.job, shallowEqual);
-  const [selectedAxis, setSelectedAxis] = useState(Array(axis.length).fill(false));
+  const [selectedAxis, setSelectedAxis] = useState(Array(axis.length).fill(false)); //useState(Array(1).fill(true).concat(Array(axis.length - 1).fill(false)));
   const [data, setData] = useState([]);
 
   const handleAxis = (event : any, index : number) => {
-    if (selectedAxis.filter(value => value === true).map((val : boolean, idx : number) => idx).length < 2) {
-      const newAxis = selectedAxis.map((ax : boolean, id : number) => {
-        return (id === index ? !ax : ax);
-      });
-      setSelectedAxis(newAxis);
+    const newAxis = selectedAxis.map((ax : boolean, id : number) => {
+      return (id === index ? !ax : ax);
+    });
 
+    if (newAxis.filter(value => value).length <= 2) {
+      setSelectedAxis(newAxis);
       console.log(newAxis, index, selectedAxis);
-  
-      obtainSlice(currAxisValues, newAxis.filter(value => value === true).map((val : boolean, idx : number) => idx));
+      obtainSlice(currAxisValues, getTrueIndices(newAxis));
     }
   };
 
+  const getTrueIndices = (arr: Array<boolean>) => {
+    const newArr : Array<number> = [];
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i]) newArr.push(i);
+    }
+    return newArr;
+  }
+
   useEffect(() => {
-    obtainSlice(currAxisValues, selectedAxis.filter(value => value === true).map((val : boolean, idx : number) => idx));
+    obtainSlice(currAxisValues, getTrueIndices(selectedAxis));
   }, [currAxisValues])
 
   async function obtainSlice(values : Array<number>, indices : Array<number>) {
     let data = await getSlice(values, indices);
-    setData(data);
+    setData(data.output);
   }
 
   const generatePlotData = () : {
